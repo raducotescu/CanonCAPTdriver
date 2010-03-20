@@ -5,13 +5,16 @@
 #                                                                              #
 # @author Radu Cotescu                                                         #
 # @version 1.0                                                                 #
+#                                                                              #
+# For more details please visit:                                               #
+#   http://radu.cotescu.com/?p=1194                                            #
 ################################################################################
 param="$1"
 param_no="$#"
 args=$@
 
-WORKSPACE="Canon_LBP_driver"
-libstdc="libstdc++5_3.3.6-17ubuntu1_amd64.deb"
+WORKSPACE="`dirname $0`/DEBS"
+libcups="libcupsys2_1.3.9-17ubuntu3.7_all.deb"
 cndrv_common="cndrvcups-common_1.90-1_amd64.deb"
 cndrv_capt="cndrvcups-capt_1.90-1_amd64.deb"
 PRINTER_MODEL=""
@@ -92,21 +95,27 @@ wget_check() {
 }
 
 install_driver() {
-	echo "Creating `pwd`/$WORKSPACE folder..."
-	mkdir $WORKSPACE
-	echo "Downloading needed packages and files..."
-	wget http://codebin.cotescu.com/canon/lbp_driver/$libstdc -O $WORKSPACE/$libstdc
-	wget_check
-	wget http://codebin.cotescu.com/canon/lbp_driver/$cndrv_common -O $WORKSPACE/$cndrv_common
-	wget_check
-	wget http://codebin.cotescu.com/canon/lbp_driver/$cndrv_capt -O $WORKSPACE/$cndrv_capt
-	wget_check
-	wget http://codebin.cotescu.com/canon/lbp_driver/ccpd -O $WORKSPACE/ccpd
-	wget_check
+	echo "Installing driver for model: $PRINTER_MODEL"
+	echo "using file: CNCUPS${PRINTER_SMODEL}CAPTK.ppd"
 	echo "Installing packages..."
-	dpkg -i $WORKSPACE/$libstdc
-	dpkg -i $WORKSPACE/$cndrv_common
-	dpkg -i $WORKSPACE/$cndrv_capt
+	if [[ -e $WORKSPACE/$libcups ]]; then
+		dpkg -i $WORKSPACE/$libcups
+	else
+		echo "$libcups is missing from $WORKSPACE folder!"
+		exit 1
+	fi
+	if [[ -e $WORKSPACE/$cndrv_common ]]; then
+		dpkg -i $WORKSPACE/$cndrv_common
+	else
+		echo "$cndrv_common is missing from $WORKSPACE folder!"
+		exit 1
+	fi
+	if [[ -e $WORKSPACE/$cndrv_capt ]]; then
+		dpkg -i $WORKSPACE/$cndrv_capt
+	else
+		echo "$cndrv_capt is missing from $WORKSPACE folder!"
+		exit 1
+	fi
 	echo "Modifying the default /etc/init.d/ccpd file..."
 	cp -f $WORKSPACE/ccpd /etc/init.d/
 	chmod a+x /etc/init.d/ccpd
@@ -114,19 +123,23 @@ install_driver() {
 	/etc/init.d/cups restart
 	echo "Setting the printer for CUPS..."
 	/usr/sbin/lpadmin -p $PRINTER_MODEL -P /usr/share/cups/model/CNCUPS${PRINTER_SMODEL}CAPTK.ppd -v ccp:/var/ccpd/fifo0 -E
-	echo "Setting the printer for CUPS..."
+	echo "Setting the printer for CAPT..."
 	/usr/sbin/ccpdadmin -p $PRINTER_MODEL -o /dev/usb/lp0
 	echo "Setting CAPT to boot with the system..."
 	update-rc.d ccpd defaults 50
+	echo "Starting ccpd..."
+	/etc/init.d/ccpd start
+	sleep 2
+	echo "Checking status:"
+	/etc/init.d/ccpd status
 	echo -e "\nPower on your printer! :)"
 	echo "Go to System - Administration - Printing and do the following:"
 	echo "  1. disable $PRINTER_MODEL-2 but do not delete it since Ubuntu will recreate it automatically;"
 	echo "  2. set $PRINTER_MODEL as your default printer;"
-	echo "  3. *restart* your machine and print a test page."
+	echo "  3. reboot your machine and print a test page."
 }
 
-clean() {
-	rm -rf $WORKSPACE
+exit_message() {
 	echo -e "Script author: \n\tRadu Cotescu"
 	echo -e "\thttp://radu.cotescu.com"
 }
@@ -134,9 +147,7 @@ clean() {
 check_superuser
 check_args
 check_printer_model
-echo "Installing driver for model: $PRINTER_MODEL"
-echo "using file: CNCUPS${PRINTER_SMODEL}CAPTK.ppd"
 install_driver
-clean
+exit_message
 exit 0
 

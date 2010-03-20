@@ -1,0 +1,59 @@
+#!/bin/sh
+# startup script for Canon Printer Daemon for CUPS (ccpd)
+# Modified for Debian GNU/Linux
+
+
+DAEMON=/usr/sbin/ccpd
+LOCKFILE=/var/lock/subsys/ccpd
+NAME=ccpd
+DESC="Canon Printer Daemon for CUPS"
+
+test -f $DAEMON || exit 0
+
+. /lib/lsb/init-functions
+
+export PATH=$PATH:/usr/local/sbin:/usr/local/bin
+
+ccpd_start ()
+{
+    log_begin_msg "Starting $DESC: $NAME"
+        start-stop-daemon --start --quiet --oknodo --exec ${DAEMON}
+        log_end_msg $?
+}
+
+ccpd_stop ()
+{
+        log_begin_msg "Stopping $DESC: $NAME"
+    start-stop-daemon --stop --quiet --oknodo --signal 15 --exec ${DAEMON}
+        log_end_msg $?
+}
+
+
+case $1 in
+
+    start)
+        ccpd_start
+        ;;
+        
+    stop)
+        ccpd_stop
+        ;;
+    
+    status)
+            echo "$DESC: $NAME:" `pidof $NAME`
+        ;;
+    
+    restart)
+            log_begin_msg "Restarting $DESC: $NAME"
+        ccpd_stop
+            sleep 2
+        ccpd_start
+            log_end_msg $?
+        ;;
+    
+    *)
+            echo "Usage: ccpd {start|stop|restart|status}"
+        exit 1
+        ;;
+esac
+exit 0
