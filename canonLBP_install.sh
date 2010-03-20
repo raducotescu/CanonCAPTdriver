@@ -1,7 +1,7 @@
 #!/bin/bash
 ################################################################################
 # This script will help you install Canon CAPT Printer Driver 1.90 for         #
-# Debian-based Linux systems using the 64-bit OS architecture.                 #
+# Debian-based Linux systems using the 32bit or 64bit OS architecture.         #
 #                                                                              #
 # @author Radu Cotescu                                                         #
 # @version 1.0                                                                 #
@@ -14,11 +14,9 @@ param_no="$#"
 args=$@
 
 WORKSPACE="`dirname $0`/DEBS"
-libcups="libcupsys2_1.3.9-17ubuntu3.7_all.deb"
-cndrv_common="cndrvcups-common_1.90-1_amd64.deb"
-cndrv_capt="cndrvcups-capt_1.90-1_amd64.deb"
 PRINTER_MODEL=""
 PRINTER_SMODEL=""
+ARCH=""
 
 models="LBP-1120 LBP-1210 LBP2900 LBP3000 LBP3010 LBP3018 LBP3050 LBP3100
 LBP3108 LBP3150 LBP3200 LBP3210 LBP3250 LBP3300 LBP3310 LBP3500 LBP5000 LBP5050
@@ -95,6 +93,15 @@ wget_check() {
 }
 
 install_driver() {
+	machine=`uname -m`
+	if [[ $machine == "x86_64" ]]; then
+		ARCH="amd64"
+	else
+		ARCH="i386"
+	fi
+	libcups="libcupsys2_1.3.9-17ubuntu3.7_all.deb"
+	cndrv_common="cndrvcups-common_1.90-1_${ARCH}.deb"
+	cndrv_capt="cndrvcups-capt_1.90-1_${ARCH}.deb"
 	echo "Installing driver for model: $PRINTER_MODEL"
 	echo "using file: CNCUPS${PRINTER_SMODEL}CAPTK.ppd"
 	echo "Installing packages..."
@@ -104,16 +111,16 @@ install_driver() {
 		echo "$libcups is missing from $WORKSPACE folder!"
 		exit 1
 	fi
-	if [[ -e $WORKSPACE/$cndrv_common ]]; then
-		dpkg -i $WORKSPACE/$cndrv_common
+	if [[ -e $WORKSPACE/$ARCH/$cndrv_common ]]; then
+		dpkg -i $WORKSPACE/$ARCH/$cndrv_common
 	else
-		echo "$cndrv_common is missing from $WORKSPACE folder!"
+		echo "$cndrv_common is missing from $WORKSPACE/$ARCH folder!"
 		exit 1
 	fi
-	if [[ -e $WORKSPACE/$cndrv_capt ]]; then
-		dpkg -i $WORKSPACE/$cndrv_capt
+	if [[ -e $WORKSPACE/$ARCH/$cndrv_capt ]]; then
+		dpkg -i $WORKSPACE/$ARCH/$cndrv_capt
 	else
-		echo "$cndrv_capt is missing from $WORKSPACE folder!"
+		echo "$cndrv_capt is missing from $WORKSPACE/$ARCH folder!"
 		exit 1
 	fi
 	echo "Modifying the default /etc/init.d/ccpd file..."
