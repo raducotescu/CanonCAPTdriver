@@ -23,7 +23,7 @@ LBP3108 LBP3150 LBP3200 LBP3210 LBP3250 LBP3300 LBP3310 LBP3500 LBP5000 LBP5050
 LBP5100 LBP5300 LBP7200C"
 
 usage_message="This script will help you install Canon CAPT Printer Driver \
-1.90 for Debian-based Linux systems using the 64-bit OS architecture.\n"
+1.90 for Debian-based Linux systems using the 32bit or 64bit OS architecture.\n"
 
 options="PRINTER_MODEL can be any of the following:\n$models"
 
