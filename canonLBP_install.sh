@@ -1,10 +1,10 @@
 #!/bin/bash
 ################################################################################
-# This script will help you install Canon CAPT Printer Driver 1.90 for         #
+# This script will help you install Canon CAPT Printer Driver 2.00 for         #
 # Debian-based Linux systems using the 32bit or 64bit OS architecture.         #
 #                                                                              #
 # @author Radu Cotescu                                                         #
-# @version 1.0                                                                 #
+# @version 2.0                                                                 #
 #                                                                              #
 # For more details please visit:                                               #
 #   http://radu.cotescu.com/?p=1194                                            #
@@ -20,10 +20,14 @@ ARCH=""
 
 models="LBP-1120 LBP-1210 LBP2900 LBP3000 LBP3010 LBP3018 LBP3050 LBP3100
 LBP3108 LBP3150 LBP3200 LBP3210 LBP3250 LBP3300 LBP3310 LBP3500 LBP5000 LBP5050
-LBP5100 LBP5300 LBP7200C"
+LBP5100 LBP5300 LBP6300dn LBP7200C LBP9100Cdn"
 
 usage_message="This script will help you install Canon CAPT Printer Driver \
+<<<<<<< HEAD:canonLBP_install.sh
+2.00 for Debian-based Linux systems using the 64-bit OS architecture.\n"
+=======
 1.90 for Debian-based Linux systems using the 32bit or 64bit OS architecture.\n"
+>>>>>>> b85fe3774119a69b48055560ab0d5fc657dfced2:canonLBP_install.sh
 
 options="PRINTER_MODEL can be any of the following:\n$models"
 
@@ -80,15 +84,37 @@ check_printer_model() {
 	"LBP-1120")
 		PRINTER_SMODEL="LBP1120"
 	;;
+	"LBP6300dn")
+		PRINTER_SMODEL="LBP6300"
+	;;
+	"LBP9100Cdn")
+		PRINTER_SMODEL="LBP9100C"
+	;;
 	*)
 		PRINTER_SMODEL=$PRINTER_MODEL
 	esac
 }
 
-wget_check() {
-	if [[ $? -ne 0 ]]; then
-		echo "Unable to get requested file..."
+packageError() {
+	if [[ $1 -ne 0 ]]; then
+		echo "I am unable to install the before mentioned package..."
+		echo "Please install the required package and rerun the script..."
 		exit 1
+	fi
+}
+
+check_requirements() {
+	release="lsb_release -r | awk '{ print $2 }'"
+	lib=6
+	if [[ "$release" < "9.10" ]]; then
+		lib=5
+	fi
+	check_lib=`dpkg-query -W -f='${Status} ${Version}\n' libstdc++${lib} 2> /dev/null | egrep "^install"`
+	if [[ -z $check_lib ]]; then
+		echo "Installing libstdc++${lib} package..."
+		apt-get -y install libstdc++${lib}
+		packageError $?
+	else echo "You do have the libstdc++${lib} package..."
 	fi
 }
 
@@ -100,11 +126,12 @@ install_driver() {
 		ARCH="i386"
 	fi
 	libcups="libcupsys2_1.3.9-17ubuntu3.7_all.deb"
-	cndrv_common="cndrvcups-common_1.90-1_${ARCH}.deb"
-	cndrv_capt="cndrvcups-capt_1.90-1_${ARCH}.deb"
+	cndrv_common="cndrvcups-common_2.00-1_${ARCH}.deb"
+	cndrv_capt="cndrvcups-capt_2.00-1_${ARCH}.deb"
 	echo "Installing driver for model: $PRINTER_MODEL"
 	echo "using file: CNCUPS${PRINTER_SMODEL}CAPTK.ppd"
 	echo "Installing packages..."
+	check_requirements
 	if [[ -e $WORKSPACE/$libcups ]]; then
 		dpkg -i $WORKSPACE/$libcups
 	else
