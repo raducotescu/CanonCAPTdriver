@@ -66,8 +66,8 @@ exit_message() {
 	echo -e "\thttp://radu.cotescu.com"
 }
 
-check_superuser
 check_args
+check_superuser
 uninstall
 exit_message
 exit 0
