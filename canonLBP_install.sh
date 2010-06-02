@@ -4,7 +4,7 @@
 # Debian-based Linux systems using the 32bit or 64bit OS architecture.         #
 #                                                                              #
 # @author Radu Cotescu                                                         #
-# @version 2.0                                                                 #
+# @version 2.1                                                                 #
 #                                                                              #
 # For more details please visit:                                               #
 #   http://radu.cotescu.com/?p=1194                                            #
@@ -38,14 +38,14 @@ check_superuser() {
 		echo "This script must be run with superuser privileges!"
 		display_usage
 		exit 1
-	fi		
+	fi
 }
 
 check_args() {
 	if [[ $param_no -ne 1 ]]; then
 		display_usage
 		exit 1
-	fi 
+	fi
 	case $param in
 		"-h" | "--help")
 			display_usage
@@ -152,7 +152,7 @@ install_driver() {
 	echo "Restarting CUPS..."
 	/etc/init.d/cups restart
 	echo "Setting the printer for CUPS..."
-	/usr/sbin/lpadmin -p $PRINTER_MODEL -P /usr/share/cups/model/CNCUPS${PRINTER_SMODEL}CAPTK.ppd -v ccp:/var/ccpd/fifo0 -E
+	/usr/sbin/lpadmin -p $PRINTER_MODEL -P /usr/share/cups/model/CNCUPS${PRINTER_SMODEL}CAPTK.ppd -v ccp://localhost:59687 -E
 	echo "Setting the printer for CAPT..."
 	/usr/sbin/ccpdadmin -p $PRINTER_MODEL -o /dev/usb/lp0
 	echo "Setting CAPT to boot with the system..."
@@ -180,4 +180,3 @@ check_printer_model
 install_driver
 exit_message
 exit 0
-

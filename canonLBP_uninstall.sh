@@ -4,7 +4,7 @@
 # based Linux distribution.                                                    #
 #                                                                              #
 # @author Radu Cotescu                                                         #
-# @version 2.0                                                                 #
+# @version 2.1                                                                 #
 #                                                                              #
 # For more details please visit:                                               #
 #   http://radu.cotescu.com/?p=1194                                            #
@@ -21,14 +21,14 @@ check_superuser() {
 		echo "This script must be run with superuser privileges!"
 		display_usage
 		exit 1
-	fi		
+	fi
 }
 
 check_args() {
 	if [[ $param_no -gt 1 ]]; then
 		display_usage
 		exit 1
-	fi 
+	fi
 	if [[ "$param" == "-h" || "$param" == "--help" ]]; then
 			display_usage
 			exit 0
@@ -54,6 +54,8 @@ uninstall() {
 			echo "Removing driver..."
 			dpkg -P cndrvcups-capt
 			dpkg -P cndrvcups-common
+			echo "Removing runlevel scripts..."
+			update-rc.d ccpd remove
 			echo "Done!"
 		fi
 	else
@@ -71,4 +73,3 @@ check_superuser
 uninstall
 exit_message
 exit 0
-
