@@ -9,7 +9,8 @@
 # For more details please visit:                                               #
 #   http://radu.cotescu.com/?p=1194                                            #
 ################################################################################
-param="$1"
+param1="$1"
+param2="$2"
 param_no="$#"
 args=$@
 
@@ -17,6 +18,8 @@ WORKSPACE="`dirname $0`/DEBS"
 PRINTER_MODEL=""
 PRINTER_SMODEL=""
 ARCH=""
+IP_REGEX="^([1-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])(\.([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])){3}$"
+IP=""
 
 models="LBP-1120 LBP-1210 LBP2900 LBP3000 LBP3010 LBP3018 LBP3050 LBP3100
 LBP3108 LBP3150 LBP3200 LBP3210 LBP3250 LBP3300 LBP3310 LBP3500 LBP5000 LBP5050
@@ -25,10 +28,12 @@ LBP5100 LBP5300 LBP6300dn LBP7200C LBP9100Cdn"
 usage_message="This script will help you install Canon CAPT Printer Driver \
 2.00 for Debian-based Linux systems using the 64-bit OS architecture.\n"
 
-options="PRINTER_MODEL can be any of the following:\n$models"
+options="PRINTER_MODEL can be any of the following:\n$models\n\n\
+If an IP is supplied the printer will be accessed from the network at that address.\
+ This setting is valid only for printers that support network printing."
 
 display_usage() {
-	echo "Usage: ./`basename $0` PRINTER_MODEL"
+	echo -e "Usage: ./`basename $0` PRINTER_MODEL [IP]\n"
 	echo -e $usage_message | fold -s
 	echo -e $options | fold -s
 }
@@ -42,23 +47,39 @@ check_superuser() {
 }
 
 check_args() {
-	if [[ $param_no -ne 1 ]]; then
-		display_usage
-		exit 1
-	fi
-	case $param in
-		"-h" | "--help")
-			display_usage
-			exit 0
-		;;
-		*)
+	if [[ $param_no -eq 1 ]]; then
+		case $param1 in
+			"-h" | "--help")
+				display_usage
+				exit 0
+			;;
+			*)
 			for model in $models; do
-				if [[ $param == $model ]]; then
-					PRINTER_MODEL=$param
+				if [[ $param1 == $model ]]; then
+					PRINTER_MODEL=$param1
 					break;
 				fi
 			done
-	esac
+			check_printer_model
+		esac
+	elif [[ $param_no -eq 2 ]]; then
+		for model in $models; do
+			if [[ $param1 == $model ]]; then
+				PRINTER_MODEL=$param1
+				break;
+			fi
+		done
+		check_printer_model
+		IP=`echo $param2 | egrep -e "$IP_REGEX"`
+		if [[ -z $IP ]]; then
+			echo "Invalid IP!"
+			exit 1
+		fi
+	else
+		echo "Wrong parameter number!"
+		display_usage
+		exit 1
+	fi
 }
 
 check_printer_model() {
@@ -154,7 +175,11 @@ install_driver() {
 	echo "Setting the printer for CUPS..."
 	/usr/sbin/lpadmin -p $PRINTER_MODEL -P /usr/share/cups/model/CNCUPS${PRINTER_SMODEL}CAPTK.ppd -v ccp://localhost:59687 -E
 	echo "Setting the printer for CAPT..."
-	/usr/sbin/ccpdadmin -p $PRINTER_MODEL -o /dev/usb/lp0
+	if [[ -z $IP ]]; then
+		/usr/sbin/ccpdadmin -p $PRINTER_MODEL -o /dev/usb/lp0
+	else
+		/usr/sbin/ccpdadmin -p $PRINTER_MODEL -o "net:$IP"
+	fi
 	echo "Setting CAPT to boot with the system..."
 	update-rc.d ccpd defaults 50
 	echo "Starting ccpd..."
@@ -176,7 +201,7 @@ exit_message() {
 
 check_superuser
 check_args
-check_printer_model
 install_driver
 exit_message
 exit 0
+

@@ -73,3 +73,4 @@ check_superuser
 uninstall
 exit_message
 exit 0
+

@@ -17,11 +17,13 @@ Current supported printers:
 
 Usage instructions:
 	1.	The script must be run with super user privileges, by providing it the
-		printer model you want to install on your computer.
+		printer model you want to install on your computer and optionally an IP
+		address, if your printer supports networked printing.
 	
 		e.g.:
 			sudo ./canonLBP_install.sh LBP2900
-
+		or
+			sudo ./canonLBP_install.sh LBP5050 192.168.2.1
+	
 	2.	Follow the messages and the instructions on screen in order to complete
 		the installation.
-
