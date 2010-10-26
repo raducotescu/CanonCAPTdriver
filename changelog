@@ -1,0 +1,13 @@
+2.2
+	- added support for Ubuntu 10.10
+2.1
+	- improved system printer linking
+	- added network support for network printers
+2.0
+	- added support for LBP6300dn and LBP9100Cdn
+	- implemented an uninstall script for CAPT driver
+1.0
+	- first release, supporting LBP-1120 LBP-1210 LBP2900 LBP3000 LBP3010
+	LBP3018 LBP3050 LBP3100 LBP3108 LBP3150 LBP3200 LBP3210 LBP3250 LBP3300
+	LBP3310 LBP3500 LBP5000 LBP5050 LBP5100 LBP5300 LBP7200C
+	- uses Canon CAPT 1.90

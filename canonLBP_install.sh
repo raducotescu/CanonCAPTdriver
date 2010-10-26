@@ -4,7 +4,7 @@
 # Debian-based Linux systems using the 32bit or 64bit OS architecture.         #
 #                                                                              #
 # @author Radu Cotescu                                                         #
-# @version 2.1                                                                 #
+# @version 2.2                                                                 #
 #                                                                              #
 # For more details please visit:                                               #
 #   http://radu.cotescu.com/?p=1194                                            #
@@ -120,10 +120,10 @@ packageError() {
 	fi
 }
 
-check_requirements() {
-	release="lsb_release -r | awk '{ print $2 }'"
+check_requirements_for_release() {
+	release="`lsb_release -r | awk '{ print $2 }'`"
 	lib=6
-	if [[ "$release" < "9.10" ]]; then
+	if [[ "$release" == "9.10" ]]; then
 		lib=5
 	fi
 	check_lib=`dpkg-query -W -f='${Status} ${Version}\n' libstdc++${lib} 2> /dev/null | egrep "^install"`
@@ -132,6 +132,23 @@ check_requirements() {
 		apt-get -y install libstdc++${lib}
 		packageError $?
 	else echo "You do have the libstdc++${lib} package..."
+	fi
+	if [[ "$release" > "10" ]]; then
+		cupsys2="cupsys_1.4.3-1ubuntu1.2_all.deb"
+		if [[ -e $WORKSPACE/$cupsys2 ]]; then
+			dpkg -i $WORKSPACE/$cupsys2
+			else
+			echo "$cupsys2 is missing from $WORKSPACE folder!"
+			exit 1
+		fi
+	else #this means we run 9.10 (9.04 is not supported any more)
+		libcups="libcupsys2_1.3.9-17ubuntu3.7_all.deb"
+		if [[ -e $WORKSPACE/$libcups ]]; then
+			dpkg -i $WORKSPACE/$libcups
+		else
+			echo "$libcups is missing from $WORKSPACE folder!"
+			exit 1
+		fi
 	fi
 }
 
@@ -142,19 +159,12 @@ install_driver() {
 	else
 		ARCH="i386"
 	fi
-	libcups="libcupsys2_1.3.9-17ubuntu3.7_all.deb"
 	cndrv_common="cndrvcups-common_2.00-1_${ARCH}.deb"
 	cndrv_capt="cndrvcups-capt_2.00-1_${ARCH}.deb"
 	echo "Installing driver for model: $PRINTER_MODEL"
 	echo "using file: CNCUPS${PRINTER_SMODEL}CAPTK.ppd"
 	echo "Installing packages..."
-	check_requirements
-	if [[ -e $WORKSPACE/$libcups ]]; then
-		dpkg -i $WORKSPACE/$libcups
-	else
-		echo "$libcups is missing from $WORKSPACE folder!"
-		exit 1
-	fi
+	check_requirements_for_release
 	if [[ -e $WORKSPACE/$ARCH/$cndrv_common ]]; then
 		dpkg -i $WORKSPACE/$ARCH/$cndrv_common
 	else
