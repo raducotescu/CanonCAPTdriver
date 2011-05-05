@@ -133,17 +133,29 @@ check_requirements_for_release() {
 		packageError $?
 	else echo "You do have the libstdc++${lib} package..."
 	fi
+	if [[ "$release" == "11.04" ]]; then
+		gsesp="gs-esp_8.71.dfsg.2-0ubuntu7_all.deb"
+		if [[ -e $WORKSPACE/$gsesp ]]; then
+			echo "Installing $gs-esp package..."
+			dpkg -i $WORKSPACE/$gsesp
+		else
+			echo "$gsesp is missing from $WORKSPACE folder!"
+			exit 1
+		fi
+	fi
 	if [[ "$release" > "10" ]]; then
 		cupsys2="cupsys_1.4.3-1ubuntu1.2_all.deb"
 		if [[ -e $WORKSPACE/$cupsys2 ]]; then
+			echo "Installing $cupsys2 package..."
 			dpkg -i $WORKSPACE/$cupsys2
-			else
+		else
 			echo "$cupsys2 is missing from $WORKSPACE folder!"
 			exit 1
 		fi
 	else #this means we run 9.10 (9.04 is not supported any more)
 		libcups="libcupsys2_1.3.9-17ubuntu3.7_all.deb"
 		if [[ -e $WORKSPACE/$libcups ]]; then
+			echo "Installing $libcups package..."
 			dpkg -i $WORKSPACE/$libcups
 		else
 			echo "$libcups is missing from $WORKSPACE folder!"
