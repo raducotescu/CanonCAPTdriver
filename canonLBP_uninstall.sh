@@ -4,7 +4,7 @@
 # based Linux distribution.                                                    #
 #                                                                              #
 # @author Radu Cotescu                                                         #
-# @version 2.2                                                                 #
+# @version 2.3                                                                 #
 #                                                                              #
 # For more details please visit:                                               #
 #   http://radu.cotescu.com/?p=1194                                            #
