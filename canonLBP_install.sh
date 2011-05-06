@@ -136,7 +136,7 @@ check_requirements_for_release() {
 	if [[ "$release" == "11.04" ]]; then
 		gsesp="gs-esp_8.71.dfsg.2-0ubuntu7_all.deb"
 		if [[ -e $WORKSPACE/$gsesp ]]; then
-			echo "Installing $gs-esp package..."
+			echo "Installing $gsesp package..."
 			dpkg -i $WORKSPACE/$gsesp
 		else
 			echo "$gsesp is missing from $WORKSPACE folder!"
