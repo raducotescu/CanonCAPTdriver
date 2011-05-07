@@ -4,7 +4,7 @@
 # based Linux distribution.                                                    #
 #                                                                              #
 # @author Radu Cotescu                                                         #
-# @version 2.3                                                                 #
+# @version 2.4                                                                 #
 #                                                                              #
 # For more details please visit:                                               #
 #   http://radu.cotescu.com/?p=1194                                            #
@@ -56,6 +56,8 @@ uninstall() {
 			dpkg -P cndrvcups-common
 			echo "Removing runlevel scripts..."
 			update-rc.d ccpd remove
+			echo "Cleaning redundant packages..."
+			apt-get -y autoremove
 			echo "Done!"
 		fi
 	else

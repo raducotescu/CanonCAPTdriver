@@ -1,3 +1,7 @@
+2.4
+	- added support for LBP6000 and LBP6018 by using the 2.20 CAPT driver from
+	Canon
+	- removed DEB packages which were not available from repositories
 2.3
 	- added support for Ubuntu 11.04
 2.2

@@ -4,7 +4,7 @@
 # Debian-based Linux systems using the 32bit or 64bit OS architecture.         #
 #                                                                              #
 # @author Radu Cotescu                                                         #
-# @version 2.3                                                                 #
+# @version 2.4                                                                 #
 #                                                                              #
 # For more details please visit:                                               #
 #   http://radu.cotescu.com/?p=1194                                            #
@@ -23,7 +23,7 @@ IP=""
 
 models="LBP-1120 LBP-1210 LBP2900 LBP3000 LBP3010 LBP3018 LBP3050 LBP3100
 LBP3108 LBP3150 LBP3200 LBP3210 LBP3250 LBP3300 LBP3310 LBP3500 LBP5000 LBP5050
-LBP5100 LBP5300 LBP6300dn LBP7200C LBP9100Cdn"
+LBP5100 LBP5300 LBP6000 LBP6018 LBP6300dn LBP7200C LBP9100Cdn"
 
 usage_message="This script will help you install Canon CAPT Printer Driver \
 2.00 for Debian-based Linux systems using the 32-bit or 64-bit OS architecture.\n"
@@ -89,6 +89,9 @@ check_printer_model() {
 		exit 1
 	fi
 	case $PRINTER_MODEL in
+	"LBP6000" | "LBP6018")
+		PRINTER_SMODEL="LBP6018"
+	;;
 	"LBP3100" | "LBP3108" | "LBP3150")
 		PRINTER_SMODEL="LBP3150"
 	;;
@@ -133,35 +136,6 @@ check_requirements_for_release() {
 		packageError $?
 	else echo "You do have the libstdc++${lib} package..."
 	fi
-	if [[ "$release" == "11.04" ]]; then
-		gsesp="gs-esp_8.71.dfsg.2-0ubuntu7_all.deb"
-		if [[ -e $WORKSPACE/$gsesp ]]; then
-			echo "Installing $gsesp package..."
-			dpkg -i $WORKSPACE/$gsesp
-		else
-			echo "$gsesp is missing from $WORKSPACE folder!"
-			exit 1
-		fi
-	fi
-	if [[ "$release" > "10" ]]; then
-		cupsys2="cupsys_1.4.3-1ubuntu1.2_all.deb"
-		if [[ -e $WORKSPACE/$cupsys2 ]]; then
-			echo "Installing $cupsys2 package..."
-			dpkg -i $WORKSPACE/$cupsys2
-		else
-			echo "$cupsys2 is missing from $WORKSPACE folder!"
-			exit 1
-		fi
-	else #this means we run 9.10 (9.04 is not supported any more)
-		libcups="libcupsys2_1.3.9-17ubuntu3.7_all.deb"
-		if [[ -e $WORKSPACE/$libcups ]]; then
-			echo "Installing $libcups package..."
-			dpkg -i $WORKSPACE/$libcups
-		else
-			echo "$libcups is missing from $WORKSPACE folder!"
-			exit 1
-		fi
-	fi
 }
 
 install_driver() {
@@ -171,8 +145,8 @@ install_driver() {
 	else
 		ARCH="i386"
 	fi
-	cndrv_common="cndrvcups-common_2.00-1_${ARCH}.deb"
-	cndrv_capt="cndrvcups-capt_2.00-1_${ARCH}.deb"
+	cndrv_common="cndrvcups-common_2.20-1_${ARCH}.deb"
+	cndrv_capt="cndrvcups-capt_2.20-1_${ARCH}.deb"
 	echo "Installing driver for model: $PRINTER_MODEL"
 	echo "using file: CNCUPS${PRINTER_SMODEL}CAPTK.ppd"
 	echo "Installing packages..."

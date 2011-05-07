@@ -1,6 +1,14 @@
 #!/bin/sh
 # startup script for Canon Printer Daemon for CUPS (ccpd)
 # Modified for Debian GNU/Linux
+### BEGIN INIT INFO
+# Provides:       ccpd
+# Required-Start: 
+# Required-Stop:
+# Default-Start:  2 3 4 5
+# Default-Stop:   1
+# Short-Description: Canon Printer Daemon for CUPS
+### END INIT INFO
 
 
 DAEMON=/usr/sbin/ccpd
